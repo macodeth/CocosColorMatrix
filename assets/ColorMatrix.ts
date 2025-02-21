@@ -1,160 +1,176 @@
-import { _decorator, CCBoolean, CCFloat, color, Color, Component, debug, error, Label, mat4, Mat4, Material, Node, Sprite, UIRenderer, UITransform, v4, Vec4 } from 'cc';
-const { ccclass, property, executeInEditMode, executionOrder, help, menu, requireComponent, type } = _decorator;
+import { _decorator, CCFloat, color, Color, Component, mat4, Mat4, Material, UIRenderer, v4, Vec4 } from 'cc';
+const { ccclass, property } = _decorator;
 
 @ccclass('ColorMatrix')
-@executeInEditMode
-@menu("2D/ColorMatrix")
 export class ColorMatrix extends Component {
-    private _colorMat = Mat4.IDENTITY.clone();  // color matrix
-    private _offset = Vec4.ZERO.clone();  // translate vector
+    protected _colorMat = Mat4.IDENTITY.clone();  // color matrix
+    protected _offset = Vec4.ZERO.clone();  // translate vector
+    @property({serializable: true})
     private _brightness = 0.0;
     @property({type: CCFloat, slide: true, max: 10.0, min: 0.0, step: 0.01})
-    public get brightness () {
+    private get brightness () {
         return this._brightness;
     }
     private set brightness (value: number) {
         this._brightness = value;
         this._updateData();
     }
+    @property({serializable: true})
     private _saturate = 0.0;
     @property({type: CCFloat, slide: true, max: 10.0, min: 0.0, step: 0.01})
-    public get saturate () {
+    private get saturate () {
         return this._saturate;
     }
     private set saturate (value: number) {
         this._saturate = value;
         this._updateData();
     }
+    @property({serializable: true})
     private _grayscale = false;
     @property
-    public get grayscale () {
+    private get grayscale () {
         return this._grayscale;
     }
     private set grayscale (value: boolean) {
         this._grayscale = value;
         this._updateData();
     }
+    @property({serializable: true})
     private _hue = 0;
     @property({type: CCFloat, slide: true, max: 360.0, min: 0.0, step: 1.0})
-    public get hueShift () {
+    private get hueShift () {
         return this._hue;
     }
     private set hueShift (value: number) {
         this._hue = value;
         this._updateData();
     }
+    @property({serializable: true})
     private _blackWhite = false;
     @property
-    public get blackWhite () {
+    private get blackWhite () {
         return this._blackWhite;
     }
     private set blackWhite (value: boolean) {
         this._blackWhite = value;
         this._updateData()
     }
+    @property({serializable: true})
     private _contrast = 0;
     @property({type: CCFloat, slide: true, max: 10.0, min: 0.0, step: 0.1})
-    public get contrast () {
+    private get contrast () {
         return this._contrast;
     }
     private set contrast (value: number) {
         this._contrast = value;
         this._updateData();
     }
+    @property({serializable: true})
     private _negative = false;
     @property
-    public get negative () {
+    private get negative () {
         return this._negative;
     }
     private set negative (value: boolean) {
         this._negative = value;
         this._updateData()
     }
+    @property({serializable: true})
     private _desaturateLuminance = false;
     @property
-    public get desaturateLuminance () {
+    private get desaturateLuminance () {
         return this._desaturateLuminance;
     }
     private set desaturateLuminance (value: boolean) {
         this._desaturateLuminance = value;
         this._updateData()
     }
+    @property({serializable: true})
     private _sepia = false;
     @property
-    public get sepia () {
+    private get sepia () {
         return this._sepia;
     }
     private set sepia (value: boolean) {
         this._sepia = value;
         this._updateData()
     }
+    @property({serializable: true})
     private _lsd = false;
     @property
-    public get lsd () {
+    private get lsd () {
         return this._lsd;
     }
     private set lsd (value: boolean) {
         this._lsd = value;
         this._updateData()
     }
+    @property({serializable: true})
     private _brown = false;
     @property
-    public get brown () {
+    private get brown () {
         return this._brown;
     }
     private set brown (value: boolean) {
         this._brown = value;
         this._updateData()
     }
+    @property({serializable: true})
     private _vintage = false;
     @property
-    public get vintage () {
+    private get vintage () {
         return this._vintage;
     }
     private set vintage (value: boolean) {
         this._vintage = value;
         this._updateData()
     }
+    @property({serializable: true})
     private _kodachrome = false;
     @property
-    public get kodachrome () {
+    private get kodachrome () {
         return this._kodachrome;
     }
     private set kodachrome (value: boolean) {
         this._kodachrome = value;
         this._updateData()
     }
+    @property({serializable: true})
     private _technicolor = false;
     @property
-    public get technicolor () {
+    private get technicolor () {
         return this._technicolor
     }
     private set technicolor (value: boolean) {
         this._technicolor = value;
         this._updateData()
     }
+    @property({serializable: true})
     private _polaroid = false;
     @property
-    public get polaroid () {
+    private get polaroid () {
         return this._polaroid;
     }
     private set polaroid (value: boolean) {
         this._polaroid = value;
         this._updateData()
     }
+    @property({serializable: true})
     private _bgrShift = false;
     @property
-    public get toBGR () {
+    private get toBGR () {
         return this._bgrShift
     }
     private set toBGR (value: boolean) {
         this._bgrShift = value;
         this._updateData()
     }
+    @property({serializable: true})
     private _night = false;
+    @property({serializable: true})
     private _nightIntensity = 0.1;
     @property
-    public get night () {
+    private get night () {
         return this._night;
     }
     private set night (value: boolean) {
@@ -163,17 +179,19 @@ export class ColorMatrix extends Component {
         this._updateData()
     }
     @property({type: CCFloat, slide: true, max: 10.0, min: 0.0, step: 0.1, visible: function (this: ColorMatrix){ return this._night;}})
-    public get nightIntensity () {
+    private get nightIntensity () {
         return this._nightIntensity;
     }
     private set nightIntensity (value: number) {
         this._nightIntensity = value;
         this._updateData()
     }
+    @property({serializable: true})
     private _predator = false;
+    @property({serializable: true})
     private _predatorIntensity = 0.1;
     @property
-    public get predator () {
+    private get predator () {
         return this._predator;
     }
     private set predator (value: boolean) {
@@ -182,18 +200,21 @@ export class ColorMatrix extends Component {
         this._updateData()
     }
     @property({type: CCFloat, slide: true, max: 10.0, min: 0.0, step: 0.1, visible: function (this: ColorMatrix){ return this._predator;}})
-    public get predatorIntensity () {
+    private get predatorIntensity () {
         return this._predatorIntensity;
     }
     private set predatorIntensity (value: number) {
         this._predatorIntensity = value;
         this._updateData()
     }
+    @property({serializable: true})
     private _duoTone = false;
+    @property({serializable: true})
     private _duoToneColor1 = color(255, 229, 128)
+    @property({serializable: true})
     private _duoToneColor2 = color(51, 128, 0)
     @property
-    public get duoTone () {
+    private get duoTone () {
         return this._duoTone;
     }
     private set duoTone (value: boolean) {
@@ -201,35 +222,26 @@ export class ColorMatrix extends Component {
         this._updateData()
     }
     @property({type: Color, visible: function (this: ColorMatrix) { return this._duoTone}})
-    public get duoToneColor1 () {
+    private get duoToneColor1 () {
         return this._duoToneColor1;
     }
-    public set duoToneColor1 (color: Color) {
+    private set duoToneColor1 (color: Color) {
         this._duoToneColor1 = color;
         this._updateData()
     }
     @property({type: Color, visible: function (this: ColorMatrix) { return this._duoTone}})
-    public get duoToneColor2 () {
+    private get duoToneColor2 () {
         return this._duoToneColor2;
     }
-    public set duoToneColor2 (color: Color) {
+    private set duoToneColor2 (color: Color) {
         this._duoToneColor2 = color;
         this._updateData()
     }
-    
-    private get _material () {
-        let comp = this.node.getComponent(UIRenderer);
-        return comp.material;
-    }
     protected onEnable(): void {
-        let comp = this.node.getComponent(UIRenderer);
-        let material = new Material();
-        material.copy(comp.material);
-        comp.material = material;
-        return;
-    }
-    protected start(): void {
         this._updateData()
+    }
+    protected update(dt: number): void {
+        this._updateMaterial()
     }
     public overrideMatrix (colorMat: Mat4, offset: Vec4) {
         this._colorMat = colorMat;
@@ -280,9 +292,8 @@ export class ColorMatrix extends Component {
         if (this._duoTone)
             this.duoToneFilter(this._duoToneColor1, this._duoToneColor2)
     }
-    private _updateMaterial () {
-        this._material.setProperty("colorMat", this._colorMat);
-        this._material.setProperty("offset", this._offset);
+    protected _updateMaterial () {
+
     }
     public multiply (matrix: Mat4, offset: Vec4, multiply: boolean = true) {
         if (!multiply) {
@@ -343,7 +354,7 @@ export class ColorMatrix extends Component {
     }
     public contrastFilter (value: number, multiply: boolean = true) {
         let v = value + 1;
-        let o = (1 - v) / 510;
+        let o = (1 - v) / 2;
         let mat = mat4(
             v, 0, 0, 0,
             0, v, 0, 0,

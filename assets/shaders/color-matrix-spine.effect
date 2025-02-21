@@ -27,15 +27,18 @@ CCProgram sprite-vs %{
   #if USE_LOCAL
     #include <builtin/uniforms/cc-local>
   #endif
-  #if SAMPLE_FROM_RT
-    #include <common/common-define>
-  #endif
+
   in vec3 a_position;
   in vec2 a_texCoord;
   in vec4 a_color;
 
-  out vec4 color;
+  out vec4 v_light;
   out vec2 uv0;
+
+  #if TWO_COLORED
+    in vec4 a_color2;
+    out vec4 v_dark;
+  #endif
 
   vec4 vert () {
     vec4 pos = vec4(a_position, 1);
@@ -44,19 +47,14 @@ CCProgram sprite-vs %{
       pos = cc_matWorld * pos;
     #endif
 
-    #if USE_PIXEL_ALIGNMENT
-      pos = cc_matView * pos;
-      pos.xyz = floor(pos.xyz);
-      pos = cc_matProj * pos;
-    #else
-      pos = cc_matViewProj * pos;
-    #endif
+    pos = cc_matViewProj * pos;
 
     uv0 = a_texCoord;
-    #if SAMPLE_FROM_RT
-      CC_HANDLE_RT_SAMPLE_FLIP(uv0);
+
+    v_light = a_color;
+    #if TWO_COLORED
+      v_dark = a_color2;
     #endif
-    color = a_color;
 
     return pos;
   }
@@ -64,36 +62,44 @@ CCProgram sprite-vs %{
 
 CCProgram sprite-fs %{
   precision highp float;
-  #include <builtin/internal/embedded-alpha>
   #include <builtin/internal/alpha-test>
 
-  in vec4 color;
-
-  #if USE_TEXTURE
-    in vec2 uv0;
-    #pragma builtin(local)
-    layout(set = 2, binding = 12) uniform sampler2D cc_spriteTexture;
+  in vec4 v_light;
+  #if TWO_COLORED
+    in vec4 v_dark;
   #endif
-  
+  in vec2 uv0;
+  #pragma builtin(local)
+  layout(set = 2, binding = 12) uniform sampler2D cc_spriteTexture;
+
   uniform DATA {
     mat4 colorMat; // scale
     vec4 offset; // translate
   };
 
   vec4 frag () {
-    vec4 o = vec4(1, 1, 1, 1);
 
-    #if USE_TEXTURE
-      o *= CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
-      o *= colorMat;
-      o += offset;
-      #if IS_GRAY
-        float gray = 0.2126 * o.r + 0.7152 * o.g + 0.0722 * o.b;
-        o.r = o.g = o.b = gray;
-      #endif
+    vec4 o = vec4(1, 1, 1, 1);
+    #if TWO_COLORED
+      vec4 texColor = vec4(1, 1, 1, 1);
+
+      texColor *= texture(cc_spriteTexture, uv0);
+
+ 	    o.a = texColor.a * v_light.a;
+      o.rgb = ((texColor.a - 1.0) * v_dark.a + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb;
+    #else
+      o *= texture(cc_spriteTexture, uv0);
+      o *= v_light;
     #endif
 
-    o *= color;
+    if (o.a > 0.0)
+      o.rgb /= o.a;
+
+    o *= colorMat;
+    o += offset;
+
+    o.rgb *= o.a;
+
     ALPHA_TEST(o);
     return o;
   }
