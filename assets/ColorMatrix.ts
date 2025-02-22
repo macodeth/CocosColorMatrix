@@ -57,7 +57,7 @@ export class ColorMatrix extends Component {
     }
     @property({serializable: true})
     private _contrast = 0;
-    @property({type: CCFloat, slide: true, max: 10.0, min: 0.0, step: 0.1})
+    @property({type: CCFloat, slide: true, max: 10.0, min: 0.0, step: 0.01})
     private get contrast () {
         return this._contrast;
     }
@@ -178,7 +178,7 @@ export class ColorMatrix extends Component {
         this._nightIntensity = 0.1;
         this._updateData()
     }
-    @property({type: CCFloat, slide: true, max: 10.0, min: 0.0, step: 0.1, visible: function (this: ColorMatrix){ return this._night;}})
+    @property({type: CCFloat, slide: true, max: 10.0, min: 0.0, step: 0.01, visible: function (this: ColorMatrix){ return this._night;}})
     private get nightIntensity () {
         return this._nightIntensity;
     }
@@ -199,7 +199,7 @@ export class ColorMatrix extends Component {
         this._predatorIntensity = 0.1;
         this._updateData()
     }
-    @property({type: CCFloat, slide: true, max: 10.0, min: 0.0, step: 0.1, visible: function (this: ColorMatrix){ return this._predator;}})
+    @property({type: CCFloat, slide: true, max: 10.0, min: 0.0, step: 0.01, visible: function (this: ColorMatrix){ return this._predator;}})
     private get predatorIntensity () {
         return this._predatorIntensity;
     }
@@ -210,9 +210,9 @@ export class ColorMatrix extends Component {
     @property({serializable: true})
     private _duoTone = false;
     @property({serializable: true})
-    private _duoToneColor1 = color(255, 229, 128)
+    private _duoToneColor1 = color(224, 148, 160)
     @property({serializable: true})
-    private _duoToneColor2 = color(51, 128, 0)
+    private _duoToneColor2 = color(20, 24, 18)
     @property
     private get duoTone () {
         return this._duoTone;
@@ -237,16 +237,6 @@ export class ColorMatrix extends Component {
         this._duoToneColor2 = color;
         this._updateData()
     }
-    @property({serializable: true})
-    private _luminanceToAlpha = false;
-    @property
-    private get luminanceToAlpha () {
-        return this._luminanceToAlpha;
-    }
-    private set luminanceToAlpha (value: boolean) {
-        this._luminanceToAlpha = value;
-        this._updateData()
-    }    
     @property({serializable: true})
     private _redBoost = 1.0;
     @property({type: CCFloat, slide: true, min: 0.0, max: 10.0, step: 0.01})
@@ -288,15 +278,14 @@ export class ColorMatrix extends Component {
         this._offset = offset;
         this._updateMaterial()
     }
-    public reset (update = true) {
+    public reset () {
         this._colorMat.zero()
         this._colorMat.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
         this._offset.set(0, 0, 0, 0);
-        if (update)
-            this._updateMaterial()
+        this._updateMaterial()
     }
     private _updateData () {
-        this.reset(false)
+        this.reset()
         this.brightnessFilter(this._brightness)
         this.saturateFilter(this._saturate)
         this.redBoostFilter(this._redBoost)
@@ -334,15 +323,13 @@ export class ColorMatrix extends Component {
             this.predatorFilter(this._predatorIntensity)
         if (this._duoTone)
             this.duoToneFilter(this._duoToneColor1, this._duoToneColor2)
-        if (this._luminanceToAlpha)
-            this.luminanceToAlphaFilter()
     }
     protected _updateMaterial () {
 
     }
     public multiply (matrix: Mat4, offset: Vec4, multiply: boolean = true) {
         if (!multiply) {
-            this.reset(false);
+            this.reset();
         }
         this._offset = v4(
             this._colorMat.m00 * offset.x + this._colorMat.m01 * offset.y + this._colorMat.m02 * offset.z + this._colorMat.m03 * offset.w + this._offset.x,
@@ -457,15 +444,6 @@ export class ColorMatrix extends Component {
             0, 0, 0, 1);
         let offset = v4(color2.r / 255, color2.g / 255, color2.b / 255, 0);
         this.multiply(mat, offset, multiply)
-    }
-    public luminanceToAlphaFilter (multiply: boolean = true) {
-        let mat = mat4(
-            0, 0, 0, 0,
-            0, 0, 0, 0, 
-            0, 0, 0, 0,
-            0.213, 0.715, 0.072, 0
-        )
-        this.multiply(mat, Vec4.ZERO, multiply)
     }
     public redBoostFilter (value: number, multiply: boolean = true) {
         let mat = mat4(
