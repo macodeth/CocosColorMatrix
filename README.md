@@ -2,14 +2,15 @@
 Transform colors using matrix to make cool effects! <br>
 Currently have 20+ presets, implementation and filters based on various sources (see [References](#references)) <br> 
 ## Presets
-| | | | | |
-|-|-|-|-|-|
-|![](/capture/original.png)|![](/capture/brightness1.5.png)|![](/capture/grayscale.png)|![](/capture/hueShift135.png)|
-|![](/capture/saturate3.png)|![](/capture/blackWhite.png)|![](/capture/contrast0.8.png)|![](/capture/negative.png)|
-|![](/capture/desaturateLuminance.png)|![](/capture/sepia.png)|![](/capture/lsd.png)|![](/capture/brown.png)|
-|![](/capture/vintage.png)|![](/capture/kodachrome.png)|![](/capture/technicolor.png)|![](/capture/polaroid.png)|
-|![](/capture/toBGR.png)|![](/capture/night0.43.png)|![](/capture/predator0.43.png)|![](/capture/duoTone.png)|
-|![](/capture/redBoost0.png)||||
+| | | |
+|-|-|-|
+|![](/capture/original.png)|![](/capture/brightness1.5.png)|![](/capture/grayscale.png)|
+|![](/capture/hueShift135.png)|![](/capture/saturate3.png)|![](/capture/blackWhite.png)|
+|![](/capture/contrast0.8.png)|![](/capture/negative.png)|![](/capture/desaturateLuminance.png)|
+|![](/capture/sepia.png)|![](/capture/lsd.png)|![](/capture/brown.png)|
+|![](/capture/vintage.png)|![](/capture/kodachrome.png)|![](/capture/technicolor.png)|
+|![](/capture/polaroid.png)|![](/capture/toBGR.png)|![](/capture/night0.43.png)|
+|![](/capture/predator0.43.png)|![](/capture/duoTone.png)|![](/capture/redBoost0.png)|
 ## Usage
 ### Setup
 Effects can be applied to Sprite or Spine skeleton <br>
