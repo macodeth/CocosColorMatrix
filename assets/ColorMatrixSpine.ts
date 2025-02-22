@@ -1,8 +1,9 @@
 import { _decorator, sp } from 'cc';
 import { ColorMatrix } from './ColorMatrix';
-const { ccclass, property, requireComponent, executeInEditMode, disallowMultiple } = _decorator;
+const { ccclass, property, requireComponent, executeInEditMode, disallowMultiple, menu } = _decorator;
 
 @ccclass('ColorMatrixSpine')
+@menu('2D/ColorMatrixSpine')
 @executeInEditMode
 @disallowMultiple(true)
 @requireComponent(sp.Skeleton)

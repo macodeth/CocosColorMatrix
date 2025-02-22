@@ -1,8 +1,9 @@
 import { _decorator, Sprite } from 'cc';
 import { ColorMatrix } from './ColorMatrix';
-const { ccclass, property, requireComponent, executeInEditMode, disallowMultiple } = _decorator;
+const { ccclass, property, requireComponent, executeInEditMode, disallowMultiple, menu } = _decorator;
 
 @ccclass('ColorMatrixSprite')
+@menu("2D/ColorMatrixSprite")
 @executeInEditMode
 @disallowMultiple(true)
 @requireComponent(Sprite)

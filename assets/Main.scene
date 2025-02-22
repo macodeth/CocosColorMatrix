@@ -333,10 +333,10 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "_brightness": 0,
-    "_saturate": 0,
+    "_brightness": 1,
     "_grayscale": false,
     "_hue": 0,
+    "_saturate": 1,
     "_blackWhite": false,
     "_contrast": 0,
     "_negative": false,
@@ -368,6 +368,10 @@
       "b": 0,
       "a": 255
     },
+    "_luminanceToAlpha": false,
+    "_redBoost": 1,
+    "_blueBoost": 1,
+    "_greenBoost": 1,
     "_id": "09Av6j4vpOeqnFkzqthIQF"
   },
   {
@@ -495,10 +499,10 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "_brightness": 0,
-    "_saturate": 0,
+    "_brightness": 1,
     "_grayscale": false,
     "_hue": 0,
+    "_saturate": 1,
     "_blackWhite": false,
     "_contrast": 0,
     "_negative": false,
@@ -530,6 +534,10 @@
       "b": 0,
       "a": 255
     },
+    "_luminanceToAlpha": false,
+    "_redBoost": 1,
+    "_blueBoost": 1,
+    "_greenBoost": 1,
     "_id": "35e4Pp56dEoZczqRLWYH1o"
   },
   {

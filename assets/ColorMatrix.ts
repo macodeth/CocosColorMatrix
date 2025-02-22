@@ -1,4 +1,4 @@
-import { _decorator, CCFloat, color, Color, Component, mat4, Mat4, Material, UIRenderer, v4, Vec4 } from 'cc';
+import { _decorator, CCFloat, color, Color, Component, mat4, Mat4, v4, Vec4 } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('ColorMatrix')
@@ -6,23 +6,13 @@ export class ColorMatrix extends Component {
     protected _colorMat = Mat4.IDENTITY.clone();  // color matrix
     protected _offset = Vec4.ZERO.clone();  // translate vector
     @property({serializable: true})
-    private _brightness = 0.0;
+    private _brightness = 1.0;
     @property({type: CCFloat, slide: true, max: 10.0, min: 0.0, step: 0.01})
     private get brightness () {
         return this._brightness;
     }
     private set brightness (value: number) {
         this._brightness = value;
-        this._updateData();
-    }
-    @property({serializable: true})
-    private _saturate = 0.0;
-    @property({type: CCFloat, slide: true, max: 10.0, min: 0.0, step: 0.01})
-    private get saturate () {
-        return this._saturate;
-    }
-    private set saturate (value: number) {
-        this._saturate = value;
         this._updateData();
     }
     @property({serializable: true})
@@ -43,6 +33,16 @@ export class ColorMatrix extends Component {
     }
     private set hueShift (value: number) {
         this._hue = value;
+        this._updateData();
+    }
+    @property({serializable: true})
+    private _saturate = 1.0;
+    @property({type: CCFloat, slide: true, max: 10.0, min: 0.0, step: 0.01})
+    private get saturate () {
+        return this._saturate;
+    }
+    private set saturate (value: number) {
+        this._saturate = value;
         this._updateData();
     }
     @property({serializable: true})
@@ -237,6 +237,46 @@ export class ColorMatrix extends Component {
         this._duoToneColor2 = color;
         this._updateData()
     }
+    @property({serializable: true})
+    private _luminanceToAlpha = false;
+    @property
+    private get luminanceToAlpha () {
+        return this._luminanceToAlpha;
+    }
+    private set luminanceToAlpha (value: boolean) {
+        this._luminanceToAlpha = value;
+        this._updateData()
+    }    
+    @property({serializable: true})
+    private _redBoost = 1.0;
+    @property({type: CCFloat, slide: true, min: 0.0, max: 10.0, step: 0.01})
+    private get redBoost () {
+        return this._redBoost;
+    }
+    private set redBoost (value: number) {
+        this._redBoost = value;
+        this._updateData();
+    }
+    @property({serializable: true})
+    private _blueBoost = 1.0;
+    @property({type: CCFloat, slide: true, min: 0.0, max: 10.0, step: 0.01})
+    private get blueBoost () {
+        return this._blueBoost;
+    }
+    private set blueBoost (value: number) {
+        this._blueBoost = value;
+        this._updateData();
+    }
+    @property({serializable: true})
+    private _greenBoost = 1.0;
+    @property({type: CCFloat, slide: true, min: 0.0, max: 10.0, step: 0.01})
+    private get greenBoost () {
+        return this._greenBoost;
+    }
+    private set greenBoost (value: number) {
+        this._greenBoost = value;
+        this._updateData();
+    }
     protected onEnable(): void {
         this._updateData()
     }
@@ -259,6 +299,9 @@ export class ColorMatrix extends Component {
         this.reset(false)
         this.brightnessFilter(this._brightness)
         this.saturateFilter(this._saturate)
+        this.redBoostFilter(this._redBoost)
+        this.blueBoostFilter(this._blueBoost)
+        this.greenBoostFilter(this._greenBoost)
         if (this._grayscale)
             this.grayscaleFilter()
         this.hueShiftFilter(this._hue)
@@ -291,6 +334,8 @@ export class ColorMatrix extends Component {
             this.predatorFilter(this._predatorIntensity)
         if (this._duoTone)
             this.duoToneFilter(this._duoToneColor1, this._duoToneColor2)
+        if (this._luminanceToAlpha)
+            this.luminanceToAlphaFilter()
     }
     protected _updateMaterial () {
 
@@ -309,7 +354,6 @@ export class ColorMatrix extends Component {
         this._updateMaterial()
     }
     public brightnessFilter (value: number, multiply: boolean = true) {
-        value += 1;
         let mat = mat4(
             value, 0, 0, 0,
             0, value, 0, 0,
@@ -318,36 +362,29 @@ export class ColorMatrix extends Component {
         );
         this.multiply(mat, Vec4.ZERO, multiply);
     }
-    public saturateFilter (value: number, multiply: boolean = true) {
-        let x = value * 2 / 3 + 1;
-        let y = (1 - x) / 2;
-        let mat = mat4(
-            x, y, y, 0,
-            y, x, y, 0,
-            y, y, x, 0,
-            0, 0, 0, 1
-        );
-        this.multiply(mat, Vec4.ZERO, multiply);
-    }
     public grayscaleFilter (multiply: boolean = true) {
         this.multiply(GRAY_SCALE, Vec4.ZERO, multiply)
     }
     public hueShiftFilter (rotation: number, multiply: boolean = true) {
-
         rotation = rotation / 180 * Math.PI;
         var cos = Math.cos(rotation);
         var sin = Math.sin(rotation);
-        var lumR = 0.213;
-        var lumG = 0.715;
-        var lumB = 0.072;
-
         let mat = mat4(
-            lumR + cos * (1 - lumR) + sin * (-lumR), lumG + cos * (-lumG) + sin * (-lumG), lumB + cos * (-lumB) + sin * (1 - lumB), 0,
-            lumR + cos * (-lumR) + sin * (0.143), lumG + cos * (1 - lumG) + sin * (0.140), lumB + cos * (-lumB) + sin * (-0.283), 0,
-            lumR + cos * (-lumR) + sin * (-(1 - lumR)), lumG + cos * (-lumG) + sin * (lumG), lumB + cos * (1 - lumB) + sin * (lumB), 0,
+            0.299 + cos * 0.701 + sin * 0.168, 0.587 - cos * 0.587 + sin * 0.330, 0.114 - cos * 0.114 - sin * 0.497, 0,
+            0.299 - cos * 0.299 - sin * 0.328, 0.587 + cos * 0.413 + sin * 0.035, 0.114 - cos * 0.114 + sin * 0.292, 0,
+            0.299 - cos * 0.299 + sin * 1.250, 0.587 - cos * 0.587 - sin * 1.050, 0.114 + cos * 0.886 - sin * 0.203, 0,
             0, 0, 0, 1
         );
         this.multiply(mat, Vec4.ZERO, multiply)
+    }
+    public saturateFilter (value: number, multiply: boolean = true) {
+        let mat = mat4(
+            0.299 + value * 0.701, 0.587 - value * 0.587, 0.114 - value * 0.114, 0,
+            0.299 - value * 0.299, 0.587 + value * 0.413, 0.114 - value * 0.114, 0,
+            0.299 - value * 0.299, 0.587 - value * 0.587, 0.114 + value * 0.886, 0,
+            0, 0, 0, 1
+        );
+        this.multiply(mat, Vec4.ZERO, multiply);
     }
     public blackWhiteFilter (multiply: boolean = true) {
         this.multiply(BLACK_WHITE, BLACK_WHITE_OFFSET, multiply)
@@ -420,6 +457,42 @@ export class ColorMatrix extends Component {
             0, 0, 0, 1);
         let offset = v4(color2.r / 255, color2.g / 255, color2.b / 255, 0);
         this.multiply(mat, offset, multiply)
+    }
+    public luminanceToAlphaFilter (multiply: boolean = true) {
+        let mat = mat4(
+            0, 0, 0, 0,
+            0, 0, 0, 0, 
+            0, 0, 0, 0,
+            0.213, 0.715, 0.072, 0
+        )
+        this.multiply(mat, Vec4.ZERO, multiply)
+    }
+    public redBoostFilter (value: number, multiply: boolean = true) {
+        let mat = mat4(
+            value, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        );
+        this.multiply(mat, Vec4.ZERO, multiply)
+    }
+    public greenBoostFilter (value: number, multiply: boolean = true) {
+        let mat = mat4(
+            1, 0, 0, 0,
+            0, value, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        );
+        this.multiply(mat, Vec4.ZERO, multiply)
+    }
+    public blueBoostFilter (value: number, multiply: boolean = true) {
+        let mat = mat4(
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, value, 0,
+            0, 0, 0, 1
+        );
+        this.multiply(mat, Vec4.ZERO, multiply)
     }
 }
 
