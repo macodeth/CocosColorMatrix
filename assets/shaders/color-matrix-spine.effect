@@ -63,6 +63,7 @@ CCProgram sprite-vs %{
 CCProgram sprite-fs %{
   precision highp float;
   #include <builtin/internal/alpha-test>
+  #include <gamma>
 
   in vec4 v_light;
   #if TWO_COLORED
@@ -92,13 +93,18 @@ CCProgram sprite-fs %{
       o *= v_light;
     #endif
 
+    o.rgb = SRGBToLinear(o.rgb);
+
     if (o.a > 0.0)
       o.rgb /= o.a;
 
     o *= colorMat;
     o += offset;
 
+
     o.rgb *= o.a;
+
+    o.rgb = LinearToSRGB(o.rgb);
 
     ALPHA_TEST(o);
     return o;

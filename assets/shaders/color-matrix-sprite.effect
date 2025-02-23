@@ -66,6 +66,7 @@ CCProgram sprite-fs %{
   precision highp float;
   #include <builtin/internal/embedded-alpha>
   #include <builtin/internal/alpha-test>
+  #include <gamma>
 
   in vec4 color;
 
@@ -88,8 +89,12 @@ CCProgram sprite-fs %{
       if (o.a > 0.0)
         o.rgb /= o.a;
 
+      o.rgb = SRGBToLinear(o.rgb);
+
       o *= colorMat;
       o += offset;
+
+      o.rgb = LinearToSRGB(o.rgb);
 
       o.rgb *= o.a;
     #endif
