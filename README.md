@@ -1,4 +1,4 @@
-# Color Matrix filters in Cocos Creator
+# Color Matrix filters in Cocos Creator 3.8+
 Transform colors using matrix to make cool effects! <br>
 Currently have 20+ presets, implementation and filters based on various sources (see [References](#references)) <br> 
 ## Presets
